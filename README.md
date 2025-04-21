@@ -1,15 +1,11 @@
-# Description of Work (10 points)
+1. Design choices made
+No overly-outlandish design choices were made. Likely the most unique thing I did was split my code into several different header files and even created a packet disector, hashing methods, and a dedicated container struct to simplify the functional portion of the code.
 
-We ask you to include a file called `README.md` that contains a quick description of:
+2. Problems encountered with the solution
+Spent a lot of time struggling with the handshake, specifically with the "finished" message and deriving the same keys for both sides. Lots of effort went into debugging and trying to understand how the client and server were producing differing transcripts for the handshake message and thus producing incongruent shared-secrets.
 
-1. the design choices you made,
-No overly exciting design choices were made. Likely the most unique thing I did was split my code into several different header files and even created a container struct to make passing buffers less of a pain. 
-
-2. any problems you encountered while creating your solution, and
-Spent a lot of time struggling with the handshake, specifically with the "finished" message and deriving the same keys for both sides. Lots of effort went into debugging and trying to understand how the client and server were producing different transcripts for the handshake message.
-
-3. your solutions to those problems.
+3. Solutions to those problems.
 There wasn't any one solution to these problems, there were several things that were broken, fixed, got broken again, and then had to be refixed or rewritten. Some of the major issues were the following:
-- Server was attempting to build it's transcript during the handshake before it had built its complete Hello message. 
-- Originally used a system to permanently store the ephemeral and static keys for the server, but some mysterious issues caused the keys to persistently be wrong so I instead opted to use only the ephemeral key, loading and immediately unloading the static key the one time it was needed.
-- Spent longer than I should have writing debugging functions to provide truncated hashes of any binary data. This made it much easier to quickly find incongruities between the client and server, but I admit it was likely not worth the time or effort for such a short term project.
+- Server was attempting to build it's transcript during the handshake before it had built its complete Hello message. The fix was simply reordering the code to ensure transcripts were only built once all requisite data was procured.
+- Originally used a system to permanently store the ephemeral and static keys for the server, but various issues caused the keys to persistently be overwritten and invalid, so I instead opted to store only the ephemeral key, loading and immediately unloading the static key the single time it was needed.
+- Spent a large portion of time writing debugging/utility functions to provide truncated hashes of any binary data. This made it much easier to quickly find incongruities between the client and server. Ended up programming an entire TLV packet disector that prints readable summaries of packets and visually-displaying the TLV nesting and hierarchy that is otherwise very difficult to visualize.
